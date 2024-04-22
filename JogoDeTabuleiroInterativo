@@ -1,0 +1,112 @@
+import java.util.Scanner;
+
+public class JogoTabuleiroInterativo {
+    private static final int LINHAS = 8;
+    private static final int COLUNAS = 16;
+    private static final char[] PERSONAGENS = {'0', 'X'};
+    private static final String[] CORES = {"\u001B[32m", "\u001B[31m"};
+    private static int[][] posicoes = new int[PERSONAGENS.length][2];
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        posicoes[0][0] = 2;
+        posicoes[0][1] = 2;
+        posicoes[1][0] = 5;
+        posicoes[1][1] = 12;
+
+        while (true) {
+            exibirTabuleiro();
+
+            System.out.println("Escolha um personagem (0 ou X) ou digite 'sair' para encerrar:");
+            String escolha = scanner.nextLine().toUpperCase();
+
+            if (escolha.equals("SAIR")) {
+                System.out.println("Jogo encerrado.");
+                break;
+            }
+
+            char personagemEscolhido = escolha.charAt(0);
+            if (!personagemValido(personagemEscolhido)) {
+                System.out.println("Personagem inválido. Tente novamente.");
+                continue;
+            }
+
+            System.out.println("Digite 'frente', 'trás', 'esquerda' ou 'direita' para mover:");
+            String direcao = scanner.nextLine().toLowerCase();
+
+            if (!direcao.equals("frente") && !direcao.equals("trás") &&
+                    !direcao.equals("esquerda") && !direcao.equals("direita")) {
+                System.out.println("Direção inválida. Tente novamente.");
+                continue;
+            }
+
+            int indexPersonagem = getIndexPersonagem(personagemEscolhido);
+            moverPersonagem(indexPersonagem, direcao);
+
+            if (posicoes[indexPersonagem][0] >= LINHAS || posicoes[indexPersonagem][0] < 0 ||
+                    posicoes[indexPersonagem][1] >= COLUNAS || posicoes[indexPersonagem][1] < 0) {
+                System.out.println("Personagem " + personagemEscolhido + " saiu do tabuleiro. Jogo encerrado.");
+                break;
+            }
+        }
+        scanner.close();
+    }
+
+    private static void exibirTabuleiro() {
+        for (int i = 0; i < LINHAS; i++) {
+            for (int j = 0; j < COLUNAS; j++) {
+                boolean personagemPresente = false;
+                for (int k = 0; k < PERSONAGENS.length; k++) {
+                    if (posicoes[k][0] == i && posicoes[k][1] == j) {
+                        System.out.print(CORES[k] + PERSONAGENS[k] + "\u001B[0m");
+                        personagemPresente = true;
+                        break;
+                    }
+                }
+                if (!personagemPresente) {
+                    System.out.print("-");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    private static boolean personagemValido(char personagem) {
+        for (char p : PERSONAGENS) {
+            if (p == personagem) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int getIndexPersonagem(char personagem) {
+        for (int i = 0; i < PERSONAGENS.length; i++) {
+            if (PERSONAGENS[i] == personagem) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void moverPersonagem(int index, String direcao) {
+        int linhaAtual = posicoes[index][0];
+        int colunaAtual = posicoes[index][1];
+
+        switch (direcao) {
+            case "frente":
+                posicoes[index][0] = linhaAtual + 1;
+                break;
+            case "trás":
+                posicoes[index][0] = linhaAtual - 1;
+                break;
+            case "esquerda":
+                posicoes[index][1] = colunaAtual - 1;
+                break;
+            case "direita":
+                posicoes[index][1] = colunaAtual + 1;
+                break;
+        }
+    }
+}
